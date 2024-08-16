@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+# pip install Flask-Cors
 from flask_cors import CORS
 
 # Inicializa a aplicação Flask
