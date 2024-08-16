@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Votação - FAESA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilo para o botão de atualizar */
+        .btn-atualizar {
+            background-color: #003366; /* Cores da FAESA */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-atualizar:hover {
+            background-color: #002244; /* Cor ao passar o mouse */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="static/images/faesa-logo.png" alt="FAESA Logo">
+        <h1>Resultados da Votação</h1>
+    </header>
+
+    <main>
+        <!-- Botão para atualizar os resultados -->
+        <button class="btn-atualizar" onclick="atualizarResultados()">Atualizar Resultados</button>
+        <table class="resultados-table">
+            <thead>
+                <tr>
+                    <th>Equipe</th>
+                    <th>Originalidade</th>
+                    <th>Design</th>
+                    <th>Utilidade</th>
+                    <th>Projeto Codificado</th>
+                    <th>Produto de Mercado</th>
+                    <th>Viabilidade</th>
+                    <th>Pitch</th>
+                    <th>Nota Total</th>
+                </tr>
+            </thead>
+            <tbody id="resultadosContainer">
+                <!-- Os resultados serão inseridos aqui pelo JavaScript -->
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 FAESA - Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Função para buscar e exibir os resultados
+        function atualizarResultados() {
+            fetch('http://127.0.0.1:5000/resultados')
+                .then(response => response.json())
+                .then(resultados => {
+                    const container = document.getElementById('resultadosContainer');
+                    // Insere os resultados na tabela
+                    container.innerHTML = resultados.map(resultado => `
+                        <tr>
+                            <td>${resultado.nomeEquipe}</td>
+                            <td>${resultado.Originalidade}</td>
+                            <td>${resultado.Design}</td>
+                            <td>${resultado.Utilidade}</td>
+                            <td>${resultado['Projeto Codificado']}</td>
+                            <td>${resultado['Produto de Mercado']}</td>
+                            <td>${resultado.Viabilidade}</td>
+                            <td>${resultado.Pitch}</td>
+                            <td>${resultado.notaTotal}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar resultados:', error);
+                });
+        }
+
+        // Carrega os resultados ao inicializar a página
+        document.addEventListener('DOMContentLoaded', atualizarResultados);
+    </script>
+</body>
+</html>
