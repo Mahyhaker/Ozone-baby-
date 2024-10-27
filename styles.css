@@ -1,73 +1,355 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #F2F2F2;
-    color: #333;
+:root {
+    --primary-color: #003366;
+    --secondary-color: #0055a4;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --border-color: #ddd;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Login/Register Styles */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.auth-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-form .logo {
+    display: block;
+    margin: 0 auto 1.5rem;
+    max-width: 150px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* Main Content Styles */
+.main-container {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
 }
 
 header {
-    background-color: #003366;
+    background-color: var(--primary-color);
     color: white;
-    padding: 10px 20px;
+    padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-header img {
-    max-height: 50px;
+.logo {
+    height: 40px;
 }
 
-h1 {
-    color: #003366;
-    font-size: 28px;
-    margin-top: 20px;
-    text-align: center;
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-main {
-    flex: 1;
-    padding: 20px;
-}
-
-.resultados-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.resultados-table th, .resultados-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-
-.resultados-table th {
-    background-color: #003366;
+.logout-btn {
+    background: transparent;
+    border: 1px solid white;
     color: white;
-    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.resultados-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+.logout-btn:hover {
+    background: white;
+    color: var(--primary-color);
 }
 
-.resultados-table tr:hover {
-    background-color: #ddd;
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
 }
 
-footer {
-    background-color: #003366;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: relative;
+.tab-btn {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-color);
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Voting Form */
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.team-input {
+    margin-bottom: 2rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.category-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+
+.submit-btn {
     width: 100%;
-    bottom: 0;
-    flex-shrink: 0;
+    padding: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
+
+.submit-btn:hover {
+    background: var(--secondary-color);
+}
+
+/* Results Section */
+.results-container {
+    padding: 2rem;
+}
+
+.team-result {
+    background: white;}/* Results Section Continued */
+    .team-result {
+        background: white;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+    }
+    
+    .team-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .team-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .total-score {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .scores-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .score-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .score-category {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .score-value {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+    }
+    
+    .voter-count {
+        margin-top: 1rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    /* Loading Animation */
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+    
+    .loading::after {
+        content: "";
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Toast Notifications */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .toast.success {
+        background-color: var(--success-color);
+    }
+    
+    .toast.error {
+        background-color: var(--error-color);
+    }
+    
+    .toast.show {
+        opacity: 1;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+    
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+    
+        .scores-grid {
+            grid-template-columns: 1fr;
+        }
+    
+        .team-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    /* Radio Button Styling */
+    .rating-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .rating-option {
+        position: relative;
+    }
+    
+    .rating-option input[type="radio"] {
+        display: none;
+    }
+    
+    .rating-option label {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #f8f9fa;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .rating-option input[type="radio"]:checked + label {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
