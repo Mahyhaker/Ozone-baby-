@@ -1,5 +1,6 @@
 // Constants and Configuration
 const API_URL = 'http://127.0.0.1:5000';
+const ADMIN_USERNAME = 'admin'; // Defina aqui seu nome de usuário de administrador
 const CATEGORIES = [
     { name: "Originalidade", weight: 1.5 },
     { name: "Design", weight: 1.2 },
@@ -55,6 +56,10 @@ function login(username, password) {
             localStorage.setItem('username', data.username);
             showMainContent();
             showToast('Login realizado com sucesso!', 'success');
+        // Se for admin, mostrar controles de administrador
+        if (currentUser === ADMIN_USERNAME) {
+            document.querySelectorAll('.admin-controls').forEach(el => el.style.display = 'block');
+        }
         } else {
             showToast('Credenciais inválidas!', 'error');
         }
@@ -99,6 +104,7 @@ function showMainContent() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('currentUser').textContent = `Olá, ${currentUser}!`;
+
     updateResults(); // Load initial results
 }
 
@@ -115,14 +121,11 @@ function toggleAuthForm() {
 }
 
 function showTab(tabName) {
-    const tabs = document.querySelectorAll('.tab-content');
-    const buttons = document.querySelectorAll('.tab-btn');
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    tabs.forEach(tab => tab.classList.remove('active'));
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
     document.getElementById(`${tabName}Section`).classList.add('active');
-    event.target.classList.add('active');
 }
 
 function showToast(message, type) {
@@ -149,21 +152,19 @@ function createVotingForm() {
         const categoryDiv = document.createElement('div');
         categoryDiv.className = 'category-card';
         
-        categoryDiv.innerHTML = `
-            <h3>${category.name}</h3>
-            <p class="weight">Peso: ${category.weight}</p>
+        categoryDiv.innerHTML = 
+            `<h3>${category.name}</h3>
             <div class="rating-group">
-                ${RATINGS.map(rating => `
-                    <div class="rating-option">
+                ${RATINGS.map(rating => 
+                    `<div class="rating-option">
                         <input type="radio" 
                                id="${category.name}-${rating.value}" 
                                name="${category.name}" 
                                value="${rating.value}">
                         <label for="${category.name}-${rating.value}">${rating.text}</label>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+                    </div>`
+                ).join('')}
+            </div>`;
         
         container.appendChild(categoryDiv);
     });
@@ -217,25 +218,28 @@ function updateResults() {
     fetch(`${API_URL}/results`)
         .then(response => response.json())
         .then(results => {
-            container.innerHTML = results.map(team => `
-                <div class="team-result fade-in">
+            container.innerHTML = results.map(team => 
+                `<div class="team-result fade-in">
                     <div class="team-header">
                         <h3 class="team-name">${team.teamName}</h3>
                         <span class="total-score">${team.totalScore.toFixed(1)} pontos</span>
+                         ${currentUser === ADMIN_USERNAME ? 
+                            `<button class="delete-btn admin-controls" onclick="deleteTeam('${team.teamName}')">Excluir Equipe</button>` 
+                            : ''}
                     </div>
                     <div class="scores-grid">
-                        ${Object.entries(team.scores).map(([category, score]) => `
-                            <div class="score-card">
+                        ${Object.entries(team.scores).map(([category, score]) => 
+                            `<div class="score-card">
                                 <div class="score-category">${category}</div>
                                 <div class="score-value">${score.toFixed(1)}</div>
-                            </div>
-                        `).join('')}
+                            </div>`
+                        ).join('')}
                     </div>
                     <div class="voter-count">
                         ${team.voterCount} avaliador${team.voterCount !== 1 ? 'es' : ''}
                     </div>
-                </div>
-            `).join('');
+                </div>`
+            ).join('');
         })
         .catch(error => {
             container.innerHTML = '<p class="error">Erro ao carregar resultados.</p>';
@@ -258,6 +262,68 @@ function setupEventListeners() {
         const password = document.getElementById('newPassword').value;
         register(username, password);
     });
-    
+    // Setup tab switching
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabName = e.target.getAttribute('data-tab');
+            showTab(tabName);
+        });
+    });
+
     document.getElementById('votingForm').addEventListener('submit', submitVotes);
 }
+
+// Admin Controls
+function setupEventListeners() {
+    // Setup tab switching
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabName = e.target.getAttribute('data-tab');
+            showTab(tabName);
+        });
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        login(username, password);
+    });
+
+    document.getElementById('votingForm').addEventListener('submit', submitVotes);
+
+    // Add event listener for delete team button
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const teamName = e.target.getAttribute('data-team-name');
+            deleteTeam(teamName);
+        });
+    });
+}
+
+function deleteTeam(teamName) {
+    if (!confirm(`Tem certeza que deseja excluir a equipe ${teamName}?`)) {
+        return;
+    }
+
+    fetch(`${API_URL}/team/${teamName}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${authToken}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast('Equipe excluída com sucesso!', 'success');
+        updateResults();
+    })
+    .catch(error => {
+        showToast('Erro ao excluir equipe!', 'error');
+        console.error('Delete error:', error);
+    });
+}
+    
+    
+

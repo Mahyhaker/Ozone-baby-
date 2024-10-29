@@ -136,5 +136,23 @@ def get_results():
     
     return jsonify(sorted(results, key=lambda x: x['totalScore'], reverse=True)), 200
 
+@app.route('/team/<team_name>', methods=['DELETE'])
+@jwt_required()
+def delete_team(team_name):
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    
+    # Verificar se é o administrador
+    if current_user.username != 'admin':
+        return jsonify({"message": "Unauthorized"}), 403
+    
+    try:
+        # Deletar todos os votos da equipe
+        Vote.query.filter_by(team_name=team_name).delete()
+        db.session.commit()
+        return jsonify({"message": "Team deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 400
+    
 if __name__ == '__main__':
     app.run(debug=True)
