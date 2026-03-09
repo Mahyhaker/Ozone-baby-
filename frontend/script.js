@@ -114,12 +114,21 @@ function register(username, password) {
 }
 
 function logout() {
+    // limpa formulário de votação
+    resetVotingForm();
+
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
-    authToken = null; currentUser = null; availTeams = [];
+
+    authToken = null;
+    currentUser = null;
+    availTeams = [];
+
     document.getElementById('mainApp').style.display = 'none';
     document.getElementById('authScreen').style.display = 'flex';
+
     switchPanel('login');
+
     toast('Sessão encerrada.', 'info');
 }
 
@@ -150,6 +159,7 @@ function enterApp() {
 
     loadTeams();
     updateResults();
+
 }
 
 // ════════════════════════════════════════════════
