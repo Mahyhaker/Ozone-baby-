@@ -1,0 +1,6 @@
+cd "C:\Users\mahyh\OneDrive\Área de Trabalho\coisas\Sistema de Votação - Copia"
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000                
+
+
+http://127.0.0.1:8000
