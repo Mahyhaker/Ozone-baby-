@@ -1,4 +1,9 @@
+/* ═══════════════════════════════════════════════
+   FAESA VOTING SYSTEM — styles.css
+   Brand: HackFAESA — Navy + Orange
+   ═══════════════════════════════════════════════ */
 
+/* ── Dark theme (default) ─────────────────────── */
 :root {
     --navy:      #1a2a4a;
     --navy-2:    #162340;
@@ -71,7 +76,7 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
 }
 
-/* ── Theme transitions */
+/* ── Theme transitions ────────────────────────── */
 body, .sidebar, .topbar, .auth-card,
 .category-card, .team-card, .team-card-header, .team-card-body,
 .team-field-card, .score-item, .admin-card, .admin-team-item,
@@ -81,7 +86,7 @@ body, .sidebar, .topbar, .auth-card,
                 color 0.15s ease, box-shadow 0.25s ease;
 }
 
-/* Reset */
+/* ── Reset ───────────────────────────────────────*/
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; scroll-behavior: smooth; }
 
@@ -103,7 +108,9 @@ input { font-family: var(--font-body); outline: none; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
 
-
+/* ══════════════════════════════════════════════
+   CIRCUIT BOARD BACKGROUND — signature HackFAESA effect
+   ══════════════════════════════════════════════ */
 .circuit-bg {
     position: absolute;
     inset: 0;
@@ -118,7 +125,7 @@ input { font-family: var(--font-body); outline: none; }
     height: 100%;
 }
 
-
+/* Floating circuit nodes */
 .circuit-node {
     position: absolute;
     border-radius: 50%;
@@ -1439,4 +1446,208 @@ input { font-family: var(--font-body); outline: none; }
     .form-actions { flex-direction: column-reverse; }
     .btn-full, .btn-submit { width: 100%; }
     .add-team-row { flex-direction: column; align-items: stretch; }
+
+/* ── User Management (Admin only) ────────────────────────────────────────── */
+.admin-user-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--navy-2, rgba(255,255,255,.04));
+    border: 1px solid transparent;
+    margin-bottom: 8px;
+    animation: fadeInUp .3s ease both;
+    transition: border-color .2s;
 }
+.admin-user-item:hover {
+    border-color: var(--border);
+}
+
+.admin-user-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--orange-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .85rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(232,98,26,.3);
+}
+
+.admin-user-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-user-name {
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--text-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-user-meta {
+    font-size: .78rem;
+    color: var(--text-3);
+}
+
+.admin-user-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.admin-btn-edit,
+.admin-btn-delete {
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: .8rem;
+    transition: transform .15s, opacity .15s;
+}
+.admin-btn-edit   { background: rgba(255,255,255,.07); color: var(--text-2); border: 1px solid var(--border); }
+.admin-btn-delete { background: rgba(239,68,68,.1); color: #f87171; border: 1px solid rgba(239,68,68,.2); }
+.admin-btn-edit:hover   { transform: scale(1.1); opacity: .9; }
+.admin-btn-delete:hover { transform: scale(1.1); opacity: .9; }
+
+/* Edit form — modal-style card */
+.admin-user-edit-form {
+    background: var(--navy-2, rgba(20,35,65,.95));
+    border: 1px solid var(--orange);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideDown .2s ease;
+    box-shadow: 0 4px 24px rgba(232,98,26,.15);
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-user-edit-form .edit-form-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 2px;
+}
+
+.admin-user-edit-form .edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-user-edit-form .edit-field label {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.admin-user-edit-form .edit-field-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy-3, #0f1a30);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0 12px;
+    transition: border-color .2s;
+}
+.admin-user-edit-form .edit-field-wrap:focus-within {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,98,26,.12);
+}
+.admin-user-edit-form .edit-field-wrap i {
+    color: var(--text-3);
+    font-size: .85rem;
+    flex-shrink: 0;
+}
+.admin-user-edit-form .edit-field-wrap input {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 10px 0;
+    color: var(--text-1);
+    font-family: inherit;
+    font-size: .9rem;
+    width: 100%;
+}
+.admin-user-edit-form .edit-field-wrap input::placeholder {
+    color: var(--text-3);
+    opacity: .6;
+}
+
+.admin-user-edit-btns {
+    display: flex;
+    gap: 8px;
+    padding-top: 2px;
+}
+
+.admin-btn-save {
+    flex: 1;
+    border: none;
+    border-radius: 9px;
+    padding: 10px;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity .15s, transform .1s;
+}
+.admin-btn-save:hover { opacity: .88; transform: translateY(-1px); }
+
+.admin-btn-cancel {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--text-3);
+    font-family: inherit;
+    font-size: .9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .15s, border-color .15s;
+}
+.admin-btn-cancel:hover { color: var(--text-1); border-color: var(--text-2); }
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: .8rem;
+}}

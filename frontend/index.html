@@ -216,10 +216,11 @@
                 <div class="section-header">
                     <div>
                         <h1 class="page-title">Painel Admin</h1>
-                        <p class="page-desc">Gerencie as equipes do hackathon</p>
+                        <p class="page-desc">Gerencie equipes e usuários do hackathon</p>
                     </div>
                 </div>
 
+                <!-- Adicionar Equipe -->
                 <div class="admin-card">
                     <div class="admin-card-title">
                         <i class="fas fa-plus-circle"></i> Adicionar Equipe
@@ -236,6 +237,7 @@
                     </div>
                 </div>
 
+                <!-- Lista de Equipes -->
                 <div class="admin-card" style="margin-top:16px">
                     <div class="admin-card-title">
                         <i class="fas fa-list-ul"></i> Equipes Cadastradas
@@ -243,6 +245,19 @@
                     </div>
                     <div id="adminTeamList" class="admin-team-list"></div>
                 </div>
+
+                <!-- Gerenciar Usuários (admin-only — hidden via JS on enterApp) -->
+                <div class="admin-card admin-only" style="margin-top:16px;display:none">
+                    <div class="admin-card-title">
+                        <i class="fas fa-users-gear"></i> Usuários Cadastrados
+                        <span class="team-count-badge" id="userCountBadge">0</span>
+                        <button class="btn-ghost btn-sm" onclick="loadUsers()" style="margin-left:auto">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                    </div>
+                    <div id="adminUserList" class="admin-team-list"></div>
+                </div>
+
             </section>
 
         </main>

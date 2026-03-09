@@ -1,7 +1,11 @@
+/* ═══════════════════════════════════════════════
+   FAESA Voting System — script.js
+   Admin creates teams; voters pick from the list.
+   ═══════════════════════════════════════════════ */
 
+// ── Config ──────────────────────────────────────
 const API_URL = '/api';
 
-// Adiciona headers padrão em todas as requisições (necessário para ngrok)
 const defaultHeaders = (extra = {}) => ({
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': '1',
@@ -36,7 +40,7 @@ const RATINGS = [
 let currentUser  = null;
 let authToken    = null;
 let ratedCount   = 0;
-let availTeams   = [];  // cached team list
+let availTeams   = [];
 
 // ── Init ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -125,23 +129,21 @@ function enterApp() {
     document.getElementById('mainApp').style.display    = 'flex';
 
     const initial = currentUser.charAt(0).toUpperCase();
-    document.getElementById('sidebarAvatar').textContent  = initial;
-    document.getElementById('chipAvatar').textContent     = initial;
+    document.getElementById('sidebarAvatar').textContent   = initial;
+    document.getElementById('chipAvatar').textContent      = initial;
     document.getElementById('sidebarUsername').textContent = currentUser;
-    document.getElementById('chipUsername').textContent   = currentUser;
+    document.getElementById('chipUsername').textContent    = currentUser;
 
     const isAdmin = currentUser === ADMIN_USERNAME;
     document.getElementById('sidebarRole').textContent = isAdmin ? 'Administrador' : 'Avaliador';
 
-    // show/hide nav items based on role
     document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = isAdmin ? 'flex' : 'none';
+        el.style.display = isAdmin ? (el.tagName === 'BUTTON' ? 'flex' : 'block') : 'none';
     });
     document.querySelectorAll('.voter-only').forEach(el => {
         el.style.display = isAdmin ? 'none' : 'flex';
     });
 
-    // redirect admin straight to admin panel, voters to voting
     if (isAdmin) {
         showTab('admin', document.querySelector('[data-tab="admin"]'));
     }
@@ -154,7 +156,7 @@ function enterApp() {
 // TEAM LOADING
 // ════════════════════════════════════════════════
 function loadTeams() {
-    return fetch(`${API_URL}/teams`)
+    return fetch(`${API_URL}/teams`, { headers: defaultHeaders() })
         .then(r => r.json())
         .then(teams => {
             availTeams = teams;
@@ -170,22 +172,22 @@ function loadTeams() {
 
 // ── voter: team chip selector ─────────────────────
 function renderTeamSelector(teams) {
-    const sel    = document.getElementById('teamSelector');
-    const noMsg  = document.getElementById('noTeamsMsg');
-    const form   = document.getElementById('votingForm');
+    const sel   = document.getElementById('teamSelector');
+    const noMsg = document.getElementById('noTeamsMsg');
+    const form  = document.getElementById('votingForm');
 
     if (!teams || teams.length === 0) {
         sel.innerHTML = '';
-        noMsg.style.display  = 'flex';
-        form.style.display   = 'none';
+        noMsg.style.display = 'flex';
+        form.style.display  = 'none';
         return;
     }
 
     noMsg.style.display = 'none';
     form.style.display  = 'block';
 
-    sel.innerHTML = teams.map(name => `
-        <button type="button"
+    sel.innerHTML = teams.map(name =>
+        `<button type="button"
                 class="team-chip"
                 data-team="${escHtml(name)}"
                 onclick="selectTeam(this)">
@@ -193,7 +195,6 @@ function renderTeamSelector(teams) {
         </button>`
     ).join('');
 
-    // clear selection
     document.getElementById('selectedTeam').value = '';
 }
 
@@ -218,8 +219,8 @@ function renderAdminTeamList(teams) {
         return;
     }
 
-    list.innerHTML = teams.map((name, i) => `
-        <div class="admin-team-item" style="animation-delay:${i*40}ms">
+    list.innerHTML = teams.map((name, i) =>
+        `<div class="admin-team-item" style="animation-delay:${i*40}ms">
             <div class="admin-team-icon"><i class="fas fa-users"></i></div>
             <span class="admin-team-name">${escHtml(name)}</span>
             <button class="admin-team-delete" onclick="deleteTeam('${escHtml(name)}')" title="Excluir equipe">
@@ -243,8 +244,9 @@ function addTeam() {
     fetch(`${API_URL}/teams`, {
         method:  'POST',
         headers: {
-            'Content-Type':  'application/json',
-            'Authorization': `Bearer ${authToken}`,
+            'Content-Type':              'application/json',
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
         },
         body: JSON.stringify({ name }),
     })
@@ -267,7 +269,10 @@ function deleteTeam(teamName) {
 
     fetch(`${API_URL}/teams/${encodeURIComponent(teamName)}`, {
         method:  'DELETE',
-        headers: { 'Authorization': `Bearer ${authToken}` },
+        headers: {
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
+        },
     })
     .then(r => { if (!r.ok) throw new Error(); return r.json(); })
     .then(() => {
@@ -294,7 +299,6 @@ function buildCategoryCards() {
         card.innerHTML = `
             <div class="category-header">
                 <span class="category-name">${cat.name}</span>
-
             </div>
             <div class="rating-group">
                 ${RATINGS.map(r => `
@@ -307,8 +311,8 @@ function buildCategoryCards() {
                             <span class="rating-num">${r.value}</span>
                             ${r.text}
                         </label>
-                    </div>`
-                ).join('')}
+                    </div>
+                `).join('')}
             </div>`;
 
         grid.appendChild(card);
@@ -355,8 +359,8 @@ function submitVotes(e) {
         return;
     }
 
-    const votes   = {};
-    let allRated  = true;
+    const votes  = {};
+    let allRated = true;
 
     CATEGORIES.forEach(cat => {
         const sel = document.querySelector(`input[name="${cat.name}"]:checked`);
@@ -384,8 +388,9 @@ function submitVotes(e) {
     fetch(`${API_URL}/vote`, {
         method:  'POST',
         headers: {
-            'Content-Type':  'application/json',
-            'Authorization': `Bearer ${authToken}`,
+            'Content-Type':              'application/json',
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
         },
         body: JSON.stringify({ teamName, votes }),
     })
@@ -393,6 +398,7 @@ function submitVotes(e) {
     .then(() => {
         toast('Avaliação enviada com sucesso!', 'success');
         resetVotingForm();
+        updateResults();
     })
     .catch(err => toast(err.message || 'Erro ao enviar avaliação.', 'error'))
     .finally(() => {
@@ -416,7 +422,7 @@ function updateResults() {
     const btn = document.getElementById('refreshBtn');
     if (btn) { btn.disabled = true; btn.querySelector('i')?.classList.add('fa-spin'); }
 
-    fetch(`${API_URL}/results`)
+    fetch(`${API_URL}/results`, { headers: defaultHeaders() })
         .then(r => r.json())
         .then(renderResults)
         .catch(() => {
@@ -452,8 +458,8 @@ function renderResults(results) {
         const badgeCls = idx < 3 ? badgeClass[idx] : '';
 
         const scoreItems = Object.entries(team.scores)
-            .map(([cat, score]) => `
-                <div class="score-item">
+            .map(([cat, score]) =>
+                `<div class="score-item">
                     <div class="score-item-name">${cat}</div>
                     <div class="score-item-val">${score}%</div>
                 </div>`
@@ -473,8 +479,8 @@ function renderResults(results) {
                 </div>
                 <span class="score-pill">${team.totalScore}%</span>
                 <div class="team-card-actions" onclick="event.stopPropagation()">
-                    ${isAdmin ? `
-                    <button class="delete-btn-sm" onclick="deleteTeam('${escHtml(team.teamName)}')">
+                    ${isAdmin ?
+                    `<button class="delete-btn-sm" onclick="deleteTeam('${escHtml(team.teamName)}')">
                         <i class="fas fa-trash"></i> Excluir
                     </button>` : ''}
                     <button class="expand-btn" title="Ver detalhes">
@@ -522,7 +528,7 @@ function showTab(tabName, btnEl) {
     document.getElementById('topbarTitle').textContent = titles[tabName] || tabName;
 
     if (tabName === 'results') updateResults();
-    if (tabName === 'admin')   loadTeams();
+    if (tabName === 'admin') { loadTeams(); loadUsers(); }
 
     if (window.innerWidth <= 768) toggleSidebar();
 }
@@ -530,8 +536,8 @@ function showTab(tabName, btnEl) {
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function togglePassword(inputId, btn) {
-    const input = document.getElementById(inputId);
-    const icon  = btn.querySelector('i');
+    const input  = document.getElementById(inputId);
+    const icon   = btn.querySelector('i');
     const isHidden = input.type === 'password';
     input.type = isHidden ? 'text' : 'password';
     icon.classList.toggle('fa-eye',       !isHidden);
@@ -629,36 +635,169 @@ function bindEvents() {
     });
 
     document.getElementById('votingForm').addEventListener('submit', submitVotes);
-    
 }
- // ════════════════════════════════════════════════
-// AUTO UPDATE GLOBAL (ATUALIZA TODAS AS PÁGINAS)
+
 // ════════════════════════════════════════════════
-
-setInterval(async () => {
-
+// AUTO REFRESH — ATUALIZA TUDO A CADA 5 SEGUNDOS
+// ════════════════════════════════════════════════
+setInterval(() => {
     if (!currentUser) return;
 
-    try {
+    loadTeams();
 
-        // atualiza equipes
-        await loadTeams();
+    const resultsTab = document.getElementById('tabResults');
+    if (resultsTab && resultsTab.classList.contains('active')) {
+        updateResults();
+    }
+}, 5000);
 
-        // atualiza resultados
-        await updateResults();
+// ════════════════════════════════════════════════
+// USER MANAGEMENT (Admin only)
+// ════════════════════════════════════════════════
 
-        // se existir equipe e usuário não estiver na aba de votação
-        const votingTab = document.getElementById('tabVoting');
-        const teamsContainer = document.getElementById('teamsContainer');
+function loadUsers() {
+    fetch(`${API_URL}/users`, {
+        headers: {
+            'Content-Type':              'application/json',
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
+        },
+    })
+    .then(r => r.json())
+    .then(renderUserList)
+    .catch(() => toast('Erro ao carregar usuários.', 'error'));
+}
 
-        if (teamsContainer && teamsContainer.children.length > 0) {
-            if (!votingTab.classList.contains('active')) {
-                showTab('tabVoting');
-            }
-        }
+function renderUserList(users) {
+    const list  = document.getElementById('adminUserList');
+    const badge = document.getElementById('userCountBadge');
+    if (!list) return;
+    if (badge) badge.textContent = users.length;
 
-    } catch (err) {
-        console.error("Auto update error:", err);
+    if (!users || users.length === 0) {
+        list.innerHTML = `
+            <div class="admin-empty">
+                <i class="fas fa-user-slash"></i>
+                Nenhum usuário cadastrado ainda.
+            </div>`;
+        return;
     }
 
-}, 5000);
+    list.innerHTML = users.map((u, i) => `
+        <div class="admin-user-item" id="user-row-${u.id}" style="animation-delay:${i*40}ms">
+            <div class="admin-user-icon"><i class="fas fa-user"></i></div>
+            <div class="admin-user-info">
+                <span class="admin-user-name">${escHtml(u.username)}</span>
+                <span class="admin-user-meta">${u.voteCount} equipe${u.voteCount !== 1 ? 's' : ''} avaliada${u.voteCount !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="admin-user-actions">
+                <button class="admin-btn-edit" onclick="openEditUser(${u.id}, '${escHtml(u.username)}')" title="Editar">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="admin-btn-delete" onclick="deleteUser(${u.id}, '${escHtml(u.username)}')" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openEditUser(userId, username) {
+    const row = document.getElementById(`user-row-${userId}`);
+    if (!row) return;
+
+    // toggle: if already open, close it
+    const existing = document.getElementById(`edit-form-${userId}`);
+    if (existing) { existing.remove(); return; }
+
+    // close any other open forms first
+    document.querySelectorAll('.admin-user-edit-form').forEach(f => f.remove());
+
+    const form = document.createElement('div');
+    form.id = `edit-form-${userId}`;
+    form.className = 'admin-user-edit-form';
+    form.innerHTML = `
+        <div class="edit-form-title">
+            <i class="fas fa-user-pen"></i> Editar usuário
+        </div>
+        <div class="edit-field">
+            <label>Novo nome de usuário</label>
+            <div class="edit-field-wrap">
+                <i class="fas fa-user"></i>
+                <input type="text" id="edit-username-${userId}"
+                       placeholder="Deixe vazio para manter"
+                       value="${escHtml(username)}"
+                       onkeydown="if(event.key==='Enter') saveUser(${userId})">
+            </div>
+        </div>
+        <div class="edit-field">
+            <label>Nova senha</label>
+            <div class="edit-field-wrap">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="edit-password-${userId}"
+                       placeholder="Deixe vazio para manter"
+                       onkeydown="if(event.key==='Enter') saveUser(${userId})">
+            </div>
+        </div>
+        <div class="admin-user-edit-btns">
+            <button class="admin-btn-save" onclick="saveUser(${userId})">
+                <i class="fas fa-check"></i> Salvar alterações
+            </button>
+            <button class="admin-btn-cancel" onclick="document.getElementById('edit-form-${userId}').remove()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>`;
+
+    row.insertAdjacentElement('afterend', form);
+    document.getElementById(`edit-username-${userId}`).focus();
+}
+
+function saveUser(userId) {
+    const newUsername = document.getElementById(`edit-username-${userId}`).value.trim();
+    const newPassword = document.getElementById(`edit-password-${userId}`).value;
+
+    if (!newUsername && !newPassword) {
+        toast('Informe ao menos um campo para atualizar.', 'error');
+        return;
+    }
+
+    const body = {};
+    if (newUsername) body.username = newUsername;
+    if (newPassword) body.password = newPassword;
+
+    fetch(`${API_URL}/users/${userId}`, {
+        method:  'PATCH',
+        headers: {
+            'Content-Type':              'application/json',
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(body),
+    })
+    .then(r => { if (!r.ok) return r.json().then(d => { throw new Error(d.message); }); return r.json(); })
+    .then(data => {
+        toast(data.message, 'success');
+        document.getElementById(`edit-form-${userId}`)?.remove();
+        loadUsers();
+    })
+    .catch(err => toast(err.message || 'Erro ao atualizar usuário.', 'error'));
+}
+
+function deleteUser(userId, username) {
+    if (!confirm(`Excluir o usuário "${username}" e todos os seus votos?\nEsta ação não pode ser desfeita.`)) return;
+
+    fetch(`${API_URL}/users/${userId}`, {
+        method:  'DELETE',
+        headers: {
+            'ngrok-skip-browser-warning': '1',
+            'Authorization':             `Bearer ${authToken}`,
+        },
+    })
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(data => {
+        toast(data.message, 'success');
+        loadUsers();
+        updateResults();
+    })
+    .catch(() => toast('Erro ao excluir usuário.', 'error'));
+}
